@@ -34,7 +34,9 @@ class PhotosViewController: UIViewController
     private func configureMapView()
     {
         mapView.addAnnotation(annotation)
-        mapView.centerCoordinate = annotation.coordinate
+        let span = MKCoordinateSpan(latitudeDelta: 0.4, longitudeDelta: 0.4)
+        let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
+        mapView.setRegion(region, animated: true)
         mapView.isUserInteractionEnabled = false
     }
     
