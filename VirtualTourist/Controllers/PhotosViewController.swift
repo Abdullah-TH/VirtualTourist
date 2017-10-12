@@ -19,6 +19,7 @@ class PhotosViewController: UIViewController
     // MARK: Properties
     
     var annotation: MKPointAnnotation!
+    var photoURLs: [URL]?
     
     // MARK: ViewController's Methods
     
@@ -27,6 +28,7 @@ class PhotosViewController: UIViewController
         super.viewDidLoad()
         configureMapView()
         setPlaceNameAsTitle()
+        initiatePhotosDownload()
     }
     
     // MARK: Helper Functions
@@ -54,16 +56,62 @@ class PhotosViewController: UIViewController
             {
                 self.title = locationName
             }
-            else if let countryName = placeMark.country
-            {
-                self.title = countryName
-            }
             else
             {
                 self.title = "Unknown"
             }
             
+            if let countryName = placeMark.country
+            {
+                self.title = "\(countryName), \(self.title ?? "")"
+            }
+            
         })
+    }
+    
+    private func initiatePhotosDownload()
+    {
+        let epsilon = 0.01
+        let minLong = annotation.coordinate.longitude - epsilon
+        let minLat = annotation.coordinate.latitude - epsilon
+        let maxLong = annotation.coordinate.longitude + epsilon
+        let maxLat = annotation.coordinate.latitude + epsilon
+        FlickrClient.getPhotosBy(minLong: minLong, minLat: minLat, maxLong: maxLong, maxLat: maxLat) { (error, urls) in
+            
+            if error == nil
+            {
+                self.photoURLs = urls
+                
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
+            else
+            {
+                let alertController = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                
+                DispatchQueue.main.async {
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+}
+
+extension PhotosViewController: UICollectionViewDataSource
+{
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
+    {
+        return photoURLs?.count ?? 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+    {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! photoCollectionViewCell
+        cell.photoURL = photoURLs?[indexPath.row]
+        return cell
     }
 }
 

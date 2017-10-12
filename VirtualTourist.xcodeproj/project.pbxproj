@@ -18,6 +18,9 @@
 		6A03AC2A1F8E0E1A00350CC3 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A03AC291F8E0E1900350CC3 /* CoreDataStack.swift */; };
 		6A03AC301F8E188300350CC3 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A03AC2F1F8E188300350CC3 /* MapKit.framework */; };
 		6A03AC321F8E1EE900350CC3 /* PhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A03AC311F8E1EE900350CC3 /* PhotosViewController.swift */; };
+		6A09B8C31F8E4DEF001FB166 /* FlickrAPIRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A09B8C21F8E4DEF001FB166 /* FlickrAPIRouter.swift */; };
+		6A09B8C51F8E6A3E001FB166 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A09B8C41F8E6A3E001FB166 /* FlickrClient.swift */; };
+		6A5413E31F8F9A3400FFDD0F /* photoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A5413E21F8F9A3400FFDD0F /* photoCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +58,9 @@
 		6A03AC291F8E0E1900350CC3 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		6A03AC2F1F8E188300350CC3 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6A03AC311F8E1EE900350CC3 /* PhotosViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosViewController.swift; sourceTree = "<group>"; };
+		6A09B8C21F8E4DEF001FB166 /* FlickrAPIRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrAPIRouter.swift; sourceTree = "<group>"; };
+		6A09B8C41F8E6A3E001FB166 /* FlickrClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
+		6A5413E21F8F9A3400FFDD0F /* photoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photoCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +144,7 @@
 		6A03AC2B1F8E0E3200350CC3 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				6A09B8C11F8E4DB1001FB166 /* Networking */,
 				6A03ABFF1F8E08EA00350CC3 /* VirtualTourist.xcdatamodeld */,
 				6A03AC291F8E0E1900350CC3 /* CoreDataStack.swift */,
 			);
@@ -149,6 +156,7 @@
 			children = (
 				6A03ABFC1F8E08EA00350CC3 /* Main.storyboard */,
 				6A03AC041F8E08EA00350CC3 /* LaunchScreen.storyboard */,
+				6A5413E21F8F9A3400FFDD0F /* photoCollectionViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -168,6 +176,15 @@
 				6A03AC2F1F8E188300350CC3 /* MapKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6A09B8C11F8E4DB1001FB166 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				6A09B8C21F8E4DEF001FB166 /* FlickrAPIRouter.swift */,
+				6A09B8C41F8E6A3E001FB166 /* FlickrClient.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -305,7 +322,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A03ABFB1F8E08EA00350CC3 /* MapViewController.swift in Sources */,
+				6A5413E31F8F9A3400FFDD0F /* photoCollectionViewCell.swift in Sources */,
 				6A03ABF91F8E08EA00350CC3 /* AppDelegate.swift in Sources */,
+				6A09B8C51F8E6A3E001FB166 /* FlickrClient.swift in Sources */,
+				6A09B8C31F8E4DEF001FB166 /* FlickrAPIRouter.swift in Sources */,
 				6A03AC011F8E08EA00350CC3 /* VirtualTourist.xcdatamodeld in Sources */,
 				6A03AC2A1F8E0E1A00350CC3 /* CoreDataStack.swift in Sources */,
 				6A03AC321F8E1EE900350CC3 /* PhotosViewController.swift in Sources */,
