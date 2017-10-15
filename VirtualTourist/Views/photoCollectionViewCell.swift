@@ -27,6 +27,13 @@ class photoCollectionViewCell: UICollectionViewCell
         }
     }
     
+    override var isSelected: Bool {
+        
+        didSet {
+            photoView.alpha = isSelected ? 0.5 : 1.0
+        }
+    }
+    
     override func awakeFromNib()
     {
         activityIndicator.startAnimating()

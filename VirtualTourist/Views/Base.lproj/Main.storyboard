@@ -72,7 +72,7 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1816.8" y="196.55172413793105"/>
+            <point key="canvasLocation" x="1826" y="197"/>
         </scene>
         <!--Photos View Controller-->
         <scene sceneID="NUk-l7-tGe">
@@ -92,7 +92,11 @@
                                 <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="fnt-s7-RHD"/>
-                                    <barButtonItem title="New Collection" id="3zC-xa-6an"/>
+                                    <barButtonItem title="New Collection" id="uE2-oL-PbR">
+                                        <connections>
+                                            <action selector="toolBarButtonPressed:" destination="xgr-v8-XkC" id="5er-eV-JlT"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="Pdy-1U-nmd"/>
                                 </items>
                             </toolbar>
@@ -172,6 +176,7 @@
                     <connections>
                         <outlet property="collectionView" destination="zJ0-Vf-KLh" id="5gy-M5-QlS"/>
                         <outlet property="mapView" destination="NF0-G6-SbL" id="lWZ-MY-YGC"/>
+                        <outlet property="toolBarButton" destination="uE2-oL-PbR" id="TxG-1H-sES"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SCj-ji-Z04" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -194,7 +199,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CTE-Zh-TRz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="969.60000000000002" y="197.9010494752624"/>
+            <point key="canvasLocation" x="959" y="197"/>
         </scene>
     </scenes>
 </document>

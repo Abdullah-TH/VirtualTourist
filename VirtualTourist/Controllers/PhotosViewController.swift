@@ -15,6 +15,7 @@ class PhotosViewController: UIViewController
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var toolBarButton: UIBarButtonItem!
     
     // MARK: Properties
     
@@ -26,9 +27,43 @@ class PhotosViewController: UIViewController
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        
         configureMapView()
         setPlaceNameAsTitle()
         initiatePhotosDownload()
+        collectionView.allowsMultipleSelection = true
+    }
+    
+    // MARK: Actions
+    
+    @IBAction func toolBarButtonPressed(_ sender: UIBarButtonItem)
+    {
+        if sender.title == "Remove Selected Photos"
+        {
+            if let indexPaths = collectionView.indexPathsForSelectedItems
+            {
+                collectionView.performBatchUpdates({
+                    
+                    for indexPath in indexPaths.sorted().reversed()
+                    {
+                        print(indexPath.row)
+                        print(self.photoURLs?.count ?? "0")
+                        self.photoURLs?.remove(at: indexPath.row)
+                    }
+                    self.collectionView.deleteItems(at: indexPaths)
+                    
+                }, completion: { (success) in
+                    
+                    print(success)
+                })
+            }
+            
+            toolBarButton.title = "New Collection"
+        }
+        else if sender.title == "New Collection"
+        {
+            initiatePhotosDownload()
+        }
     }
     
     // MARK: Helper Functions
@@ -118,6 +153,26 @@ extension PhotosViewController: UICollectionViewDataSource
         cell.photoURL = photoURLs?[indexPath.row]
         return cell
     }
+}
+
+extension PhotosViewController: UICollectionViewDelegate
+{
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath)
+    {
+        let cell = collectionView.cellForItem(at: indexPath) as! photoCollectionViewCell
+        cell.isSelected = true
+        toolBarButton.title = "Remove Selected Photos"
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath)
+    {
+        if collectionView.indexPathsForSelectedItems!.isEmpty
+        {
+            toolBarButton.title = "New Collection"
+        }
+    }
+    
+    
 }
 
 extension PhotosViewController: UICollectionViewDelegateFlowLayout
