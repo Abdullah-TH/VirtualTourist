@@ -83,7 +83,12 @@ class PhotosViewController: UIViewController
                 self.photoURLs = urls
                 
                 DispatchQueue.main.async {
+                    
                     self.collectionView.reloadData()
+                    if self.photoURLs!.isEmpty
+                    {
+                        self.collectionView.isHidden = true
+                    }
                 }
             }
             else
