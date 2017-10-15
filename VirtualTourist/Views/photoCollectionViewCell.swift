@@ -10,8 +10,8 @@ import UIKit
 
 class photoCollectionViewCell: UICollectionViewCell
 {
-    @IBOutlet weak var photoView: UIImageView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var photoView: UIImageView!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     var photoURL: URL? {
         

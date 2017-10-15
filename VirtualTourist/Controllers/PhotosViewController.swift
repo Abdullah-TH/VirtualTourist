@@ -115,6 +115,40 @@ extension PhotosViewController: UICollectionViewDataSource
     }
 }
 
+extension PhotosViewController: UICollectionViewDelegateFlowLayout
+{
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
+    {
+        var width = collectionView.bounds.width
+        width = width / 3.0 // width of each three cells
+        
+        // spacing between a cell and other cell, or edge, is 6
+        // between three cells, there are 4 such spacing |1[]2[]3[]4|
+        // so each cell should be subtracted by 6 for the spacing
+        // but there is one (6 point space) remained
+        // this space should be distributed among the three cells: 6/3 = 2
+        // so each cell is subtracted by 6 + 2 = 8
+        width = width - 8
+        
+        return CGSize(width: width, height: width)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat
+    {
+        return 6
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat
+    {
+        return 6
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets
+    {
+        return UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+    }
+}
+
 
 
 
