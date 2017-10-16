@@ -19,6 +19,7 @@ class photoCollectionViewCell: UICollectionViewCell
             
             if photoView.image == nil
             {
+                activityIndicator.startAnimating()
                 downloadPhoto(completionHandler: { (image) in
                     self.photoView.image = image
                     self.activityIndicator.stopAnimating()
@@ -34,9 +35,10 @@ class photoCollectionViewCell: UICollectionViewCell
         }
     }
     
-    override func awakeFromNib()
+    override func prepareForReuse()
     {
-        activityIndicator.startAnimating()
+        super.prepareForReuse()
+        photoView.image = nil
     }
     
     private func downloadPhoto(completionHandler: @escaping (UIImage?) -> Void)

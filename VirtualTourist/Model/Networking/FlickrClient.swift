@@ -81,21 +81,68 @@ class FlickrClient
     {
         var photoURLs = [URL]()
         
-        for photoDict in photoArray
+        let randomIndexes = generateDistinctRandomInt(upperBound: photoArray.count)
+        
+        if photoArray.count > max
         {
-            if let id = photoDict["id"] as? String,
-               let secret = photoDict["secret"] as? String,
-               let server = photoDict["server"] as? String,
-               let farm = photoDict["farm"] as? Int
+            for index in randomIndexes
             {
-                let url = constructFlickrPhotoURL(id: id, secret: secret, server: server, farm: farm)
-                photoURLs.append(url!)
+                let photoDict = photoArray[index]
+                if let url = getPhotoURL(from: photoDict)
+                {
+                    photoURLs.append(url)
+                }
             }
-            
-            if photoURLs.count == max { break }
+        }
+        else
+        {
+            for photoDict in photoArray
+            {
+                if let url = getPhotoURL(from: photoDict)
+                {
+                    photoURLs.append(url)
+                }
+                
+                if photoURLs.count == max { break }
+            }
         }
         
         return photoURLs
+    }
+    
+    private static func generateDistinctRandomInt(upperBound: Int) -> [Int]
+    {
+        var randomIndexes = [Int]()
+        while true
+        {
+            let randomNumber = Int(arc4random_uniform(UInt32(upperBound)))
+            if randomIndexes.contains(randomNumber)
+            {
+                continue
+            }
+            else
+            {
+                randomIndexes.append(randomNumber)
+                if randomIndexes.count == 21
+                {
+                    break
+                }
+            }
+        }
+        return randomIndexes
+    }
+    
+    private static func getPhotoURL(from photoDictionary: [String: Any]) -> URL?
+    {
+        if let id = photoDictionary["id"] as? String,
+            let secret = photoDictionary["secret"] as? String,
+            let server = photoDictionary["server"] as? String,
+            let farm = photoDictionary["farm"] as? Int
+        {
+            let url = constructFlickrPhotoURL(id: id, secret: secret, server: server, farm: farm)
+            return url
+        }
+        return nil
     }
     
     private static func constructFlickrPhotoURL(id: String, secret: String, server: String, farm: Int) -> URL?
