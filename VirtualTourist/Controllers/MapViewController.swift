@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController
 {
@@ -24,6 +25,7 @@ class MapViewController: UIViewController
         super.viewDidLoad()
         navigationItem.rightBarButtonItem = editButtonItem
         bottomRedViewHeightConstraint.constant = 0
+        fetchPins()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?)
@@ -58,6 +60,32 @@ class MapViewController: UIViewController
         }
     }
     
+    // MARK: Helper Functions
+    
+    private func fetchPins()
+    {
+        let stack = CoreDataStack.shared!
+        let fetch = NSFetchRequest<Pin>(entityName: "Pin")
+        do
+        {
+            let pins = try stack.context.fetch(fetch)
+            for pin in pins
+            {
+                let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = coordinate
+                mapView.addAnnotation(annotation)
+            }
+        }
+        catch let error
+        {
+            let alertController = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+            alertController.addAction(okAction)
+            present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     // MARK: Actions
     
     @IBAction func mapLongPressed(_ sender: UILongPressGestureRecognizer)
@@ -68,7 +96,25 @@ class MapViewController: UIViewController
             let coordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinate
-            mapView.addAnnotation(annotation)
+            
+            let stack = CoreDataStack.shared!
+            let pin = Pin(entity: Pin.entity(), insertInto: stack.context)
+            pin.latitude = annotation.coordinate.latitude
+            pin.longitude = annotation.coordinate.longitude
+            do
+            {
+                try stack.saveContext()
+                mapView.addAnnotation(annotation)
+                print(String(format: "latitude == %lf AND longitude == %lf", annotation.coordinate.latitude, annotation.coordinate.longitude))
+            }
+            catch let error
+            {
+                let alertController = UIAlertController(title: "Cannot add pin", message: error.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                present(alertController, animated: true, completion: nil)
+            }
+            
         }
     }
 }
@@ -86,10 +132,30 @@ extension MapViewController: MKMapViewDelegate
         }
         else
         {
-            mapView.removeAnnotation(view.annotation!)
-            if mapView.annotations.isEmpty
+            let annotation = view.annotation!
+            let stack = CoreDataStack.shared!
+            let fetch = NSFetchRequest<Pin>(entityName: "Pin")
+            let predicate = NSPredicate(format: "latitude == %lf AND longitude == %lf", annotation.coordinate.latitude, annotation.coordinate.longitude)
+            fetch.predicate = predicate
+            do
             {
-                setEditing(false, animated: true)
+                let pins = try stack.context.fetch(fetch)
+                print(pins.isEmpty)
+                if let pin = pins.first
+                {
+                    print(pin.latitude, pin.longitude)
+                    stack.context.delete(pin)
+                    try stack.context.save()
+                    mapView.removeAnnotation(view.annotation!)
+                    if mapView.annotations.isEmpty
+                    {
+                        setEditing(false, animated: true)
+                    }
+                }
+            }
+            catch let error
+            {
+                print(error)
             }
         }
     }

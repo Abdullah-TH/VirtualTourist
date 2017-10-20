@@ -180,7 +180,7 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
     {
         var width = collectionView.bounds.width
-        width = width / 3.0 // width of each three cells
+        width = width / 3.0 // width of each cell in a row of three cells
         
         // spacing between a cell and other cell, or edge, is 6
         // between three cells, there are 4 such spacing |1[]2[]3[]4|

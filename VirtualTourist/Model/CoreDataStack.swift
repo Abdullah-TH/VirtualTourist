@@ -12,7 +12,7 @@ import CoreData
 struct CoreDataStack
 {
     // MARK: Shared Instance
-    static let shared = CoreDataStack(modelName: "Model")
+    static let shared = CoreDataStack(modelName: "VirtualTourist")
     
     // MARK: Properties
     
