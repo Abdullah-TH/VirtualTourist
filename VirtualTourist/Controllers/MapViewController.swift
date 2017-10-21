@@ -34,7 +34,27 @@ class MapViewController: UIViewController
         {
             let annotation = sender as! MKPointAnnotation
             let photosVC = segue.destination as! PhotosViewController
-            photosVC.annotation = annotation
+            
+            let stack = CoreDataStack.shared!
+            let fetch = NSFetchRequest<Pin>(entityName: "Pin")
+            let predicate = NSPredicate(format: "latitude == %lf AND longitude == %lf", annotation.coordinate.latitude, annotation.coordinate.longitude)
+            fetch.predicate = predicate
+            do
+            {
+                let pins = try stack.context.fetch(fetch)
+                print(pins.isEmpty)
+                if let pin = pins.first
+                {
+                    photosVC.pin = pin
+                }
+            }
+            catch let error
+            {
+                let alertController = UIAlertController(title: "Cannot delete pin", message: error.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                present(alertController, animated: true, completion: nil)
+            }
         }
     }
 
@@ -155,7 +175,10 @@ extension MapViewController: MKMapViewDelegate
             }
             catch let error
             {
-                print(error)
+                let alertController = UIAlertController(title: "Cannot delete pin", message: error.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "Ok", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                present(alertController, animated: true, completion: nil)
             }
         }
     }

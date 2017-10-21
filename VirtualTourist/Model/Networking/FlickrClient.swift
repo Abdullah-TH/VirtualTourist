@@ -81,10 +81,9 @@ class FlickrClient
     {
         var photoURLs = [URL]()
         
-        let randomIndexes = generateDistinctRandomInt(upperBound: photoArray.count)
-        
         if photoArray.count > max
         {
+            let randomIndexes = generateDistinctRandomInt(upperBound: photoArray.count)
             for index in randomIndexes
             {
                 let photoDict = photoArray[index]

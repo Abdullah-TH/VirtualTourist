@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class PhotosViewController: UIViewController
 {
@@ -19,19 +20,30 @@ class PhotosViewController: UIViewController
     
     // MARK: Properties
     
-    var annotation: MKPointAnnotation!
-    var photoURLs: [URL]?
+    var pin: Pin!
+    var photos = [Photo]()
     
     // MARK: ViewController's Methods
     
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        
+        collectionView.allowsMultipleSelection = true
         configureMapView()
         setPlaceNameAsTitle()
-        initiatePhotosDownload()
-        collectionView.allowsMultipleSelection = true
+        toolBarButton.isEnabled = false
+        if pin.photos!.count == 0
+        {
+            initiatePhotosDownload()
+        }
+        else
+        {
+            for photo in pin.photos!
+            {
+                photos.append(photo as! Photo)
+            }
+            toolBarButton.isEnabled = true
+        }
     }
     
     // MARK: Actions
@@ -42,19 +54,42 @@ class PhotosViewController: UIViewController
         {
             if let indexPaths = collectionView.indexPathsForSelectedItems
             {
+                var deletedPhotos = [Photo]()
+                
                 collectionView.performBatchUpdates({
                     
                     for indexPath in indexPaths.sorted().reversed()
                     {
-                        print(indexPath.row)
-                        print(self.photoURLs?.count ?? "0")
-                        self.photoURLs?.remove(at: indexPath.row)
+                        let deletedPhoto = self.photos.remove(at: indexPath.row)
+                        deletedPhotos.append(deletedPhoto)
                     }
                     self.collectionView.deleteItems(at: indexPaths)
                     
                 }, completion: { (success) in
                     
-                    print(success)
+                    if success
+                    {
+                        let stack = CoreDataStack.shared!
+                        for deletedPhoto in deletedPhotos
+                        {
+                            stack.context.delete(deletedPhoto)
+                        }
+                        
+                        do
+                        {
+                            try stack.saveContext()
+                        }
+                        catch let error
+                        {
+                            print(error)
+                        }
+                        
+                        if self.photos.isEmpty
+                        {
+                            self.collectionView.isHidden = true
+                            
+                        }
+                    }
                 })
             }
             
@@ -62,7 +97,23 @@ class PhotosViewController: UIViewController
         }
         else if sender.title == "New Collection"
         {
-            initiatePhotosDownload()
+            do
+            {
+                let stack = CoreDataStack.shared!
+                for photo in pin.photos!
+                {
+                    let photo = photo as! Photo
+                    stack.context.delete(photo)
+                }
+                try stack.context.save()
+                photos.removeAll()
+                collectionView.reloadData()
+                initiatePhotosDownload()
+            }
+            catch let error
+            {
+                print(error)
+            }
         }
     }
     
@@ -70,6 +121,8 @@ class PhotosViewController: UIViewController
     
     private func configureMapView()
     {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
         mapView.addAnnotation(annotation)
         let span = MKCoordinateSpan(latitudeDelta: 0.4, longitudeDelta: 0.4)
         let region = MKCoordinateRegion(center: annotation.coordinate, span: span)
@@ -80,6 +133,8 @@ class PhotosViewController: UIViewController
     private func setPlaceNameAsTitle()
     {
         let geoCoder = CLGeocoder()
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
         let location = CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)
         
         geoCoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) -> Void in
@@ -107,6 +162,8 @@ class PhotosViewController: UIViewController
     private func initiatePhotosDownload()
     {
         let epsilon = 0.01
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
         let minLong = annotation.coordinate.longitude - epsilon
         let minLat = annotation.coordinate.latitude - epsilon
         let maxLong = annotation.coordinate.longitude + epsilon
@@ -115,12 +172,28 @@ class PhotosViewController: UIViewController
             
             if error == nil
             {
-                self.photoURLs = urls
-                
                 DispatchQueue.main.async {
                     
+                    for url in urls!
+                    {
+                        let photo = Photo(entity: Photo.entity(), insertInto: CoreDataStack.shared!.context)
+                        photo.imageURL = url.absoluteString
+                        photo.pin = self.pin
+                        self.photos.append(photo)
+                        print(photo)
+                    }
+                    
+                    do
+                    {
+                        try CoreDataStack.shared!.saveContext()
+                    }
+                    catch let error
+                    {
+                        print(error)
+                    }
+                    
                     self.collectionView.reloadData()
-                    if self.photoURLs!.isEmpty
+                    if self.photos.isEmpty
                     {
                         self.collectionView.isHidden = true
                     }
@@ -144,13 +217,14 @@ extension PhotosViewController: UICollectionViewDataSource
 {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
     {
-        return photoURLs?.count ?? 0
+        return photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
     {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! photoCollectionViewCell
-        cell.photoURL = photoURLs?[indexPath.row]
+        let photo = photos[indexPath.row]
+        cell.photo = photo
         return cell
     }
 }

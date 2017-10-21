@@ -13,17 +13,31 @@ class photoCollectionViewCell: UICollectionViewCell
     @IBOutlet private weak var photoView: UIImageView!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-    var photoURL: URL? {
+    var photo: Photo? {
         
         didSet {
             
-            if photoView.image == nil
+            if photo!.imageData == nil
             {
                 activityIndicator.startAnimating()
-                downloadPhoto(completionHandler: { (image) in
-                    self.photoView.image = image
+                downloadPhoto(completionHandler: {
+                    
+                    do
+                    {
+                        try CoreDataStack.shared!.saveContext()
+                    }
+                    catch let error
+                    {
+                        print(error)
+                    }
+                    
+                    self.photoView.image = UIImage(data: self.photo!.imageData!)
                     self.activityIndicator.stopAnimating()
                 })
+            }
+            else
+            {
+                self.photoView.image = UIImage(data: self.photo!.imageData!)
             }
         }
     }
@@ -41,17 +55,19 @@ class photoCollectionViewCell: UICollectionViewCell
         photoView.image = nil
     }
     
-    private func downloadPhoto(completionHandler: @escaping (UIImage?) -> Void)
+    private func downloadPhoto(completionHandler: @escaping () -> Void)
     {
         DispatchQueue.global(qos: .userInitiated).async {
             
             do
             {
-                let data = try Data(contentsOf: self.photoURL!)
-                let image = UIImage(data: data)
+                let url = URL(string: self.photo!.imageURL!)!
+                let data = try Data(contentsOf: url)
                 
                 DispatchQueue.main.async {
-                    completionHandler(image)
+                    
+                    self.photo!.imageData = data
+                    completionHandler()
                 }
             }
             catch let error
