@@ -26,16 +26,11 @@ class MapViewController: UIViewController
         navigationItem.rightBarButtonItem = editButtonItem
         bottomRedViewHeightConstraint.constant = 0
         fetchPins()
-    }
-    
-    override func viewWillAppear(_ animated: Bool)
-    {
-        super.viewWillAppear(animated)
         
         if let latitudeCenter = UserDefaults.standard.value(forKey: "latitudeCenter") as? Double,
-           let longitudeCenter = UserDefaults.standard.value(forKey: "longitudeCenter") as? Double,
-           let latitudeDelta = UserDefaults.standard.value(forKey: "latitudeDelta") as? Double,
-           let longitudeDelta = UserDefaults.standard.value(forKey: "longitudeDelta") as? Double
+            let longitudeCenter = UserDefaults.standard.value(forKey: "longitudeCenter") as? Double,
+            let latitudeDelta = UserDefaults.standard.value(forKey: "latitudeDelta") as? Double,
+            let longitudeDelta = UserDefaults.standard.value(forKey: "longitudeDelta") as? Double
         {
             let coordinateCenter = CLLocationCoordinate2D(latitude: latitudeCenter, longitude: longitudeCenter)
             let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
