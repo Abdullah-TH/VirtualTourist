@@ -97,6 +97,7 @@ class PhotosViewController: UIViewController
         }
         else if sender.title == "New Collection"
         {
+            toolBarButton.isEnabled = false 
             do
             {
                 let stack = CoreDataStack.shared!
@@ -197,6 +198,8 @@ class PhotosViewController: UIViewController
                     {
                         self.collectionView.isHidden = true
                     }
+                    
+                    self.toolBarButton.isEnabled = true
                 }
             }
             else

@@ -17,27 +17,33 @@ class photoCollectionViewCell: UICollectionViewCell
         
         didSet {
             
-            if photo!.imageData == nil
+            if let photo = photo
             {
-                activityIndicator.startAnimating()
-                downloadPhoto(completionHandler: {
-                    
-                    do
-                    {
-                        try CoreDataStack.shared!.saveContext()
-                    }
-                    catch let error
-                    {
-                        print(error)
-                    }
-                    
-                    self.photoView.image = UIImage(data: self.photo!.imageData!)
-                    self.activityIndicator.stopAnimating()
-                })
-            }
-            else
-            {
-                self.photoView.image = UIImage(data: self.photo!.imageData!)
+                if photo.imageData == nil
+                {
+                    activityIndicator.startAnimating()
+                    downloadPhoto(completionHandler: {
+                        
+                        do
+                        {
+                            try CoreDataStack.shared!.saveContext()
+                        }
+                        catch let error
+                        {
+                            print(error)
+                        }
+                        
+                        if let imageData = photo.imageData
+                        {
+                            self.photoView.image = UIImage(data: imageData)
+                        }
+                        self.activityIndicator.stopAnimating()
+                    })
+                }
+                else
+                {
+                    self.photoView.image = UIImage(data: photo.imageData!)
+                }
             }
         }
     }
