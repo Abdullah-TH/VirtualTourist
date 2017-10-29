@@ -28,6 +28,24 @@ class MapViewController: UIViewController
         fetchPins()
     }
     
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+        
+        if let latitudeCenter = UserDefaults.standard.value(forKey: "latitudeCenter") as? Double,
+           let longitudeCenter = UserDefaults.standard.value(forKey: "longitudeCenter") as? Double,
+           let latitudeDelta = UserDefaults.standard.value(forKey: "latitudeDelta") as? Double,
+           let longitudeDelta = UserDefaults.standard.value(forKey: "longitudeDelta") as? Double
+        {
+            let coordinateCenter = CLLocationCoordinate2D(latitude: latitudeCenter, longitude: longitudeCenter)
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            let region = MKCoordinateRegion(center: coordinateCenter, span: span)
+            mapView.setRegion(region, animated: false)
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillResignActive), name: .UIApplicationWillResignActive, object: nil)
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?)
     {
         if segue.identifier == "MapToPhotos"
@@ -81,6 +99,19 @@ class MapViewController: UIViewController
     }
     
     // MARK: Helper Functions
+    
+    @objc private func applicationWillResignActive()
+    {
+        let latitudeCenter = self.mapView.region.center.latitude
+        let longitudeCenter = self.mapView.region.center.longitude
+        let latitudeDelta = self.mapView.region.span.latitudeDelta
+        let longitudeDelta = self.mapView.region.span.longitudeDelta
+        
+        UserDefaults.standard.set(latitudeCenter, forKey: "latitudeCenter")
+        UserDefaults.standard.set(longitudeCenter, forKey: "longitudeCenter")
+        UserDefaults.standard.set(latitudeDelta, forKey: "latitudeDelta")
+        UserDefaults.standard.set(longitudeDelta, forKey: "longitudeDelta")
+    }
     
     private func fetchPins()
     {
