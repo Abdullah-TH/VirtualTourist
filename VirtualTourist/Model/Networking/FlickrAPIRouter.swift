@@ -12,6 +12,7 @@ enum FlickrAPIRouter
 {
     // Possible requests
     case searchPhotos(apiKey: String, bbox: (minLong: Double, minLat: Double, maxLong: Double, maxLat: Double))
+    case searchPhotosInPage(apiKey: String, bbox: (minLong: Double, minLat: Double, maxLong: Double, maxLat: Double), page: Int)
     
     // Base URL
     static let baseURLString = "https://api.flickr.com"
@@ -20,7 +21,7 @@ enum FlickrAPIRouter
     var method: String {
         switch self
         {
-        case .searchPhotos(apiKey: _, bbox: (minLong: _, minLat: _, maxLong: _, maxLat: _)):
+        case .searchPhotos, .searchPhotosInPage:
             return "GET"
         }
     }
@@ -29,7 +30,7 @@ enum FlickrAPIRouter
     var relativePath: String {
         switch self
         {
-        case .searchPhotos(apiKey: _, bbox: (minLong: _, minLat: _, maxLong: _, maxLat: _)):
+        case .searchPhotos, .searchPhotosInPage:
             return "/services/rest/"
         }
     }
@@ -45,6 +46,14 @@ enum FlickrAPIRouter
             items.append(URLQueryItem(name: "format", value: "json"))
             items.append(URLQueryItem(name: "nojsoncallback", value: "1"))
             items.append(URLQueryItem(name: "bbox", value: "\(minLong),\(minLat),\(maxLong),\(maxLat)"))
+            
+        case .searchPhotosInPage(apiKey: let apiKey, bbox: (minLong: let minLong, minLat: let minLat, maxLong: let maxLong, maxLat: let maxLat), page: let page):
+            items.append(URLQueryItem(name: "method", value: "flickr.photos.search"))
+            items.append(URLQueryItem(name: "api_key", value: apiKey))
+            items.append(URLQueryItem(name: "format", value: "json"))
+            items.append(URLQueryItem(name: "nojsoncallback", value: "1"))
+            items.append(URLQueryItem(name: "bbox", value: "\(minLong),\(minLat),\(maxLong),\(maxLat)"))
+            items.append(URLQueryItem(name: "page", value: "\(page)"))
         }
         return items
     }

@@ -162,7 +162,7 @@ class PhotosViewController: UIViewController
     
     private func initiatePhotosDownload()
     {
-        let epsilon = 0.01
+        let epsilon = 0.02
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
         let minLong = annotation.coordinate.longitude - epsilon

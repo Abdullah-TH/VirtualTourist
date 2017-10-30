@@ -13,9 +13,10 @@ class FlickrClient
     /// Get 21 random photos inside the specified bbox
     static func getPhotosBy(minLong: Double, minLat: Double, maxLong: Double, maxLat: Double, completionHandler completion: @escaping (_ error: Error?, _ photoURLs: [URL]?) -> Void)
     {
-        let request = FlickrAPIRouter.searchPhotos(apiKey: "3f695e85f4ddb49365f3f7b673d4a86a", bbox: (minLong: minLong, minLat: minLat, maxLong: maxLong, maxLat: maxLat)).asUrlRequest()
-        print(request.url!)
+        let apiKey = "3f695e85f4ddb49365f3f7b673d4a86a"
+        let request = FlickrAPIRouter.searchPhotos(apiKey: apiKey, bbox: (minLong: minLong, minLat: minLat, maxLong: maxLong, maxLat: maxLat)).asUrlRequest()
         let session = URLSession.shared
+        
         let task = session.dataTask(with: request) { (data, response, error) in
             
             func sendError(message: String)
@@ -58,14 +59,75 @@ class FlickrClient
                     return
                 }
                 
-                guard let photoArray = photosDictionary["photo"] as? [[String: Any]] else
+                guard let pages = photosDictionary["pages"] as? Int else
                 {
-                    sendError(message: "Cannot get the 'photo' array")
+                    sendError(message: "Cannot get the 'pages' value")
                     return
                 }
                 
-                let photoURLs = getRandomPhotoURLs(photoArray: photoArray, max: 21)
-                completion(nil, photoURLs)
+                let randomPage = Int( arc4random_uniform( UInt32(pages) ) )
+                let request = FlickrAPIRouter.searchPhotosInPage(apiKey: apiKey, bbox: (minLong: minLong, minLat: minLat, maxLong: maxLong, maxLat: maxLat), page: randomPage).asUrlRequest()
+                
+                let task = session.dataTask(with: request, completionHandler: { (data, urlResponse, error) in
+                    
+                    func sendError(message: String)
+                    {
+                        let error = NSError(domain: "getPhotosBy", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
+                        completion(error, nil)
+                    }
+                    
+                    guard error == nil else
+                    {
+                        completion(error, nil)
+                        return
+                    }
+                    
+                    guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode == 200 else
+                    {
+                        sendError(message: "Error: Got status code other than 200\n Status code is: \((response as! HTTPURLResponse).statusCode)")
+                        return
+                    }
+                    
+                    guard let data = data else
+                    {
+                        sendError(message: "Error: No data received.")
+                        return
+                    }
+                    
+                    do
+                    {
+                        let jsonObject = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+                        
+                        guard let jsonDictionary = jsonObject as? [String: Any] else
+                        {
+                            sendError(message: "Cannot cast json to [String: Any]")
+                            return
+                        }
+                        
+                        guard let photosDictionary = jsonDictionary["photos"] as? [String: Any] else
+                        {
+                            sendError(message: "Cannot get the 'photos' dictionary")
+                            return
+                        }
+                        
+                        guard let photoArray = photosDictionary["photo"] as? [[String: Any]] else
+                        {
+                            sendError(message: "Cannot get the 'photo' array")
+                            return
+                        }
+                        
+                        let photoURLs = getRandomPhotoURLs(photoArray: photoArray, max: 21)
+                        completion(nil, photoURLs)
+                        
+                    }
+                    catch let error
+                    {
+                        completion(error, nil)
+                        return
+                    }
+                })
+                
+                task.resume()
             }
             catch let error
             {
