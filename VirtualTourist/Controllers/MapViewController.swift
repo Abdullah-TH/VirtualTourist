@@ -136,7 +136,7 @@ class MapViewController: UIViewController
     
     @IBAction func mapLongPressed(_ sender: UILongPressGestureRecognizer)
     {
-        if sender.state == .ended && !isEditing
+        if sender.state == .began && !isEditing
         {
             let touchLocation = sender.location(in: mapView)
             let coordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
