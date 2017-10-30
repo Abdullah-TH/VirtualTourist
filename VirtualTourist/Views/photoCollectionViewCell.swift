@@ -63,16 +63,17 @@ class photoCollectionViewCell: UICollectionViewCell
     
     private func downloadPhoto(completionHandler: @escaping () -> Void)
     {
-        DispatchQueue.global(qos: .userInitiated).async {
+        let stack = CoreDataStack.shared!
+        
+        stack.privateContext.perform {
             
             do
             {
                 let url = URL(string: self.photo!.imageURL!)!
                 let data = try Data(contentsOf: url)
+                self.photo!.imageData = data
                 
                 DispatchQueue.main.async {
-                    
-                    self.photo!.imageData = data
                     completionHandler()
                 }
             }
